@@ -19,11 +19,11 @@ map <Space>i gg=<S-g><C-o><C-o>zz
 
 "--------------------------------------------------
 " <Space>v で1行選択(\n含まず)
-noremap <Space>v 0v$h
+"noremap <Space>v 0v$h
 
 "--------------------------------------------------
 " <Space>d で1行削除(\n含まずに dd)
-noremap <Space>d 0v$hx
+"noremap <Space>d 0v$hx
 
 "--------------------------------------------------
 " <Space>y で改行なしで1行コピー（\n を含まずに yy）
@@ -32,11 +32,16 @@ noremap <Space>y 0v$hy
 "--------------------------------------------------
 " <Space>s で置換
 noremap <Space>s :%s/
- " カーソル下のURLをブラウザで開く
+
+"VimFiler起動
+noremap <Space>f :VimFiler<CR>
+"ローカルなカレントディレクトリに移動
+noremap <Space>lcd :lcd %:h<CR>
+" カーソル下のURLをブラウザで開く
 nmap <Leader>o <Plug>(openbrowser-open)
 vmap <Leader>o <Plug>(openbrowser-open)
 " ググる
-nnoremap <Leader>g :<C-u>OpenBrowserSearch<Space><C-r><C-w><Enter>
+"nnoremap <Leader>g :<C-u>OpenBrowserSearch<Space><C-r><C-w><Enter>
 
 " <Space>cd で編集ファイルのカレントディレクトリへと移動
 command! -nargs=? -complete=dir -bang CD  call s:ChangeCurrentDir('<args>', '<bang>') 
@@ -55,6 +60,50 @@ endfunction
 " Change current directory.
 nnoremap <silent> <Space>cd :<C-u>CD<CR>
 
+" Anywhere SID.
+function! s:SID_PREFIX()
+  return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
+endfunction
+
+" Set tabline.
+function! s:my_tabline()  "{{{
+  let s = ''
+  for i in range(1, tabpagenr('$'))
+    let bufnrs = tabpagebuflist(i)
+    let bufnr = bufnrs[tabpagewinnr(i) - 1]  " first window, first appears
+    let no = i  " display 0-origin tabpagenr.
+    let mod = getbufvar(bufnr, '&modified') ? '!' : ' '
+    let title = fnamemodify(bufname(bufnr), ':t')
+    let title = '[' . title . ']'
+    let s .= '%'.i.'T'
+    let s .= '%#' . (i == tabpagenr() ? 'TabLineSel' : 'TabLine') . '#'
+    let s .= no . ':' . title
+    let s .= mod
+    let s .= '%#TabLineFill# '
+  endfor
+  let s .= '%#TabLineFill#%T%=%#TabLine#'
+  return s
+endfunction "}}}
+let &tabline = '%!'. s:SID_PREFIX() . 'my_tabline()'
+set showtabline=2 " 常にタブラインを表示
+
+" The prefix key.
+nnoremap    [Tag]   <Nop>
+nmap    t [Tag]
+" Tab jump
+for n in range(1, 9)
+  execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
+endfor
+" t1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
+
+map <silent> [Tag]c :tablast <bar> tabnew<CR>
+" tc 新しいタブを一番右に作る
+map <silent> [Tag]x :tabclose<CR>
+" tx タブを閉じる
+map <silent> [Tag]n :tabnext<CR>
+" tn 次のタブ
+map <silent> [Tag]p :tabprevious<CR>
+" tp 前のタブ
 "検索関係
 set ignorecase          " 大文字小文字を区別しない
 set smartcase           " 検索文字に大文字がある場合は大文字小文字を区別
@@ -169,7 +218,7 @@ NeoBundle 'open-browser.vim'
 NeoBundle 'mattn/webapi-vim'
 "NeoBundle 'tell-k/vim-browsereload-mac'
 NeoBundle 'hail2u/vim-css3-syntax'
-NeoBundle 'taichouchou2/html5.vim'
+"NeoBundle 'taichouchou2/html5.vim'
 NeoBundle 'taichouchou2/vim-javascript'
 NeoBundle 'kchmck/vim-coffee-script'
 call neobundle#end()
@@ -182,13 +231,16 @@ let g:unite_enable_ignore_case = 1
 let g:unite_enable_smart_case = 1
 
 " grep検索
-nnoremap <silent> ,g  :<C-u>Unite grep:. -buffer-name=search-buffer<CR>
+nnoremap <silent> <Space>g  :<C-u>Unite grep:. -buffer-name=search-buffer<CR>
 "
 " カーソル位置の単語をgrep検索
-nnoremap <silent> ,cg :<C-u>Unite grep:. -buffer-name=search-buffer<CR><C-R><C-W>
+nnoremap <silent> <Space>cg :<C-u>Unite grep:. -buffer-name=search-buffer<CR><C-R><C-W>
 "
 " grep検索結果の再呼出
-nnoremap <silent> ,r  :<C-u>UniteResume search-buffer<CR>
+nnoremap <silent> <Space>r  :<C-u>UniteResume search-buffer<CR>
+
+"Quickrun停止
+nnoremap <expr><silent> <C-c> quickrun#is_running() ? quickrun#sweep_sessions() : "\<C-c>"
 
 " unite grep に ag(The Silver Searcher) を使う
 if executable('ag')
@@ -340,12 +392,8 @@ endif
 let g:neocomplete#force_omni_input_patterns.cpp =
 			\ '[^.[:digit:] *\t]\%(\.\|->\)\w*\|\h\w*::\w*'
 "watchdogs
-let g:quickrun_config = {
-			\
-			\   "cpp/watchdogs_checker" : {
+let g:quickrun_config['cpp/watchdogs_checker'] = {
 			\       "type" : "watchdogs_checker/g++",
-			\   },
-			\
 			\}
 call watchdogs#setup(g:quickrun_config)
 " include path
