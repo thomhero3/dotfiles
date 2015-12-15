@@ -4,11 +4,6 @@ augroup MyAutoCmd
 augroup END
 set nocompatible
 filetype off            " for NeoBundle
-"ハイライト設定
-hi Pmenu ctermbg=4 ctermfg=255
-hi PmenuSel ctermbg=1 ctermfg=11
-hi PMenuSbar ctermbg=4 ctermfg=225
-
 "**************************************************
 " <Space>* によるキーバインド設定
 "**************************************************
@@ -204,6 +199,17 @@ NeoBundle 'hail2u/vim-css3-syntax'
 "NeoBundle 'taichouchou2/html5.vim'
 NeoBundle 'taichouchou2/vim-javascript'
 NeoBundle 'kchmck/vim-coffee-script'
+NeoBundle 'itchyny/lightline.vim'
+ " solarized
+NeoBundle 'altercation/vim-colors-solarized'
+" mustang
+NeoBundle 'croaker/mustang-vim'
+" jellybeans
+NeoBundle 'nanotech/jellybeans.vim'
+" molokai
+NeoBundle 'tomasr/molokai'
+
+NeoBundle 'ujihisa/unite-colorscheme'
 call neobundle#end()
 
 "insert modeで開始
@@ -516,8 +522,11 @@ else
 	" set clipboard& clipboard+=unnamed,autoselect 2013-06-24 10:00 autoselect 削除
 	set clipboard& clipboard+=unnamed
 endif
-
-
+"カラースキーマの設定
+colorscheme molokai
+hi Comment ctermfg=46
+hi Function ctermfg=75
+hi PreProc ctermfg=229
 " ~/.vimrc.localが存在する場合のみ設定を読み込む
 let s:local_vimrc = expand('~/.vimrc.local')
 if filereadable(s:local_vimrc)
