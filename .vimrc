@@ -4,11 +4,12 @@ augroup MyAutoCmd
 augroup END
 set nocompatible
 filetype off            " for NeoBundle
-
 "ハイライト設定
-hi Pmenu ctermbg=4
-hi PmenuSel ctermbg=1
-hi PMenuSbar ctermbg=4
+hi Comment ctermfg=46
+hi Pmenu ctermbg=4 ctermfg=255
+hi PmenuSel ctermbg=1 ctermfg=11
+hi PMenuSbar ctermbg=4 ctermfg=225
+ 
 "**************************************************
 " <Space>* によるキーバインド設定
 "**************************************************
