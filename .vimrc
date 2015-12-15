@@ -104,7 +104,22 @@ NeoBundle 'kana/vim-textobj-user'
 NeoBundle 'kana/vim-operator-replace'
 NeoBundle 'hynek/vim-python-pep8-indent'
 NeoBundle 'kana/vim-textobj-indent'
+NeoBundle 'bps/vim-textobj-python'
 
+" surround.vim 使用例
+"  こんにちは ← vで選択後にS<div>と入力
+" <div>こんにちは</div> 
+
+"  <div>こんにちは</div> ← dstと入力
+" こんにちは
+
+"  <div>こんにちは</div> ← cst<span>と入力
+" <span>こんにちは</span>
+NeoBundle 'tpope/vim-surround'
+
+
+"HTML作成 http://docs.emmet.io/abbreviations/syntax/
+NeoBundle 'mattn/emmet-vim'
 call neobundle#end()
 
 "insert modeで開始
