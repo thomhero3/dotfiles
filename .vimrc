@@ -210,6 +210,7 @@ NeoBundle 'nanotech/jellybeans.vim'
 NeoBundle 'tomasr/molokai'
 
 NeoBundle 'ujihisa/unite-colorscheme'
+NeoBundle 'nathanaelkane/vim-indent-guides'
 call neobundle#end()
 
 "insert modeで開始
@@ -527,6 +528,7 @@ colorscheme molokai
 hi Comment ctermfg=46
 hi Function ctermfg=75
 hi PreProc ctermfg=229
+hi Delimiter ctermfg=229
 " ~/.vimrc.localが存在する場合のみ設定を読み込む
 let s:local_vimrc = expand('~/.vimrc.local')
 if filereadable(s:local_vimrc)
