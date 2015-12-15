@@ -5,11 +5,10 @@ augroup END
 set nocompatible
 filetype off            " for NeoBundle
 "ハイライト設定
-hi Comment ctermfg=46
 hi Pmenu ctermbg=4 ctermfg=255
 hi PmenuSel ctermbg=1 ctermfg=11
 hi PMenuSbar ctermbg=4 ctermfg=225
- 
+
 "**************************************************
 " <Space>* によるキーバインド設定
 "**************************************************
@@ -44,46 +43,29 @@ vmap <Leader>o <Plug>(openbrowser-open)
 " ググる
 "nnoremap <Leader>g :<C-u>OpenBrowserSearch<Space><C-r><C-w><Enter>
 
-" <Space>cd で編集ファイルのカレントディレクトリへと移動
-command! -nargs=? -complete=dir -bang CD  call s:ChangeCurrentDir('<args>', '<bang>') 
-function! s:ChangeCurrentDir(directory, bang)
-	if a:directory == ''
-		lcd %:p:h
-	else
-		execute 'lcd' . a:directory
-	endif
-
-	if a:bang == ''
-		pwd
-	endif
-endfunction
-
-" Change current directory.
-nnoremap <silent> <Space>cd :<C-u>CD<CR>
-
 " Anywhere SID.
 function! s:SID_PREFIX()
-  return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
+	return matchstr(expand('<sfile>'), '<SNR>\d\+_\zeSID_PREFIX$')
 endfunction
 
 " Set tabline.
 function! s:my_tabline()  "{{{
-  let s = ''
-  for i in range(1, tabpagenr('$'))
-    let bufnrs = tabpagebuflist(i)
-    let bufnr = bufnrs[tabpagewinnr(i) - 1]  " first window, first appears
-    let no = i  " display 0-origin tabpagenr.
-    let mod = getbufvar(bufnr, '&modified') ? '!' : ' '
-    let title = fnamemodify(bufname(bufnr), ':t')
-    let title = '[' . title . ']'
-    let s .= '%'.i.'T'
-    let s .= '%#' . (i == tabpagenr() ? 'TabLineSel' : 'TabLine') . '#'
-    let s .= no . ':' . title
-    let s .= mod
-    let s .= '%#TabLineFill# '
-  endfor
-  let s .= '%#TabLineFill#%T%=%#TabLine#'
-  return s
+	let s = ''
+	for i in range(1, tabpagenr('$'))
+		let bufnrs = tabpagebuflist(i)
+		let bufnr = bufnrs[tabpagewinnr(i) - 1]  " first window, first appears
+		let no = i  " display 0-origin tabpagenr.
+		let mod = getbufvar(bufnr, '&modified') ? '!' : ' '
+		let title = fnamemodify(bufname(bufnr), ':t')
+		let title = '[' . title . ']'
+		let s .= '%'.i.'T'
+		let s .= '%#' . (i == tabpagenr() ? 'TabLineSel' : 'TabLine') . '#'
+		let s .= no . ':' . title
+		let s .= mod
+		let s .= '%#TabLineFill# '
+	endfor
+	let s .= '%#TabLineFill#%T%=%#TabLine#'
+	return s
 endfunction "}}}
 let &tabline = '%!'. s:SID_PREFIX() . 'my_tabline()'
 set showtabline=2 " 常にタブラインを表示
@@ -93,7 +75,7 @@ nnoremap    [Tag]   <Nop>
 nmap    t [Tag]
 " Tab jump
 for n in range(1, 9)
-  execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
+	execute 'nnoremap <silent> [Tag]'.n  ':<C-u>tabnext'.n.'<CR>'
 endfor
 " t1 で1番左のタブ、t2 で1番左から2番目のタブにジャンプ
 
@@ -345,9 +327,9 @@ nmap <F10> :SCCompileRun<cr>
 nmap <Space>c <Plug>(caw:I:toggle)
 vmap <Space>c <Plug>(caw:I:toggle)
 
-" <Space>e でコメントアウトの解除
-nmap <Space>e <Plug>(caw:I:uncomment)
-vmap <Space>e <Plug>(caw:I:uncomment)
+" <Space>C でコメントアウトの解除
+nmap <Space>C <Plug>(caw:I:uncomment)
+vmap <Space>C <Plug>(caw:I:uncomment)
 "<Space>m でカーソル下の単語、もしくは選択した範囲のハイライトを行う
 " 再度 <Space>m を行うとカーソル下のハイライトを解除する
 " これは複数の単語のハイライトを行う事もできる
