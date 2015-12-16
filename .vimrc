@@ -33,7 +33,12 @@ noremap <Space>f :VimFiler<CR>
 "ローカルなカレントディレクトリに移動
 noremap <Space>lcd :lcd %:h<CR>
 
+" 翻訳
+noremap <Space>et :ExciteTranslate<CR>
+noremap <Space>cs :setlocal spell<CR>
+noremap <Space>ns :setlocal nospell<CR>
 noremap <Space>q :QuickRun<CR>
+noremap <Space>gc :GrammarousCheck<CR>
 " カーソル下のURLをブラウザで開く
 nmap <Leader>o <Plug>(openbrowser-open)
 vmap <Leader>o <Plug>(openbrowser-open)
@@ -213,8 +218,28 @@ NeoBundle 'tomasr/molokai'
 
 NeoBundle 'ujihisa/unite-colorscheme'
 NeoBundle 'nathanaelkane/vim-indent-guides'
+NeoBundle 'thinca/vim-ref'
+NeoBundle 'mfumi/ref-dicts-en'
+NeoBundle 'tyru/vim-altercmd'
+NeoBundle 'mattn/webapi-vim'
+NeoBundle 'mattn/excitetranslate-vim'
+NeoBundle 'ujihisa/neco-look'
+NeoBundle 'rhysd/vim-grammarous'
 call neobundle#end()
-
+if !exists('g:neocomplete#text_mode_filetypes')
+    let g:neocomplete#text_mode_filetypes = {}
+endif
+let g:neocomplete#text_mode_filetypes = {
+            \ 'rst': 1,
+            \ 'markdown': 1,
+            \ 'gitrebase': 1,
+            \ 'gitcommit': 1,
+            \ 'vcs-commit': 1,
+            \ 'hybrid': 1,
+            \ 'text': 1,
+            \ 'help': 1,
+            \ 'tex': 1,
+            \ }
 "insert modeで開始
 "let g:unite_enable_start_insert = 1
 
@@ -514,52 +539,84 @@ function! s:ChangeCurrentDir(directory, bang)
 		pwd
 	endif
 endfunction
-inoremap { {}<LEFT>
-inoremap [ []<LEFT>
-inoremap ( ()<LEFT>
-inoremap " ""<LEFT>
-inoremap ' ''<LEFT>
-vnoremap { "zdi^V{<C-R>z}<ESC>
-vnoremap [ "zdi^V[<C-R>z]<ESC>
-vnoremap ( "zdi^V(<C-R>z)<ESC>
-vnoremap " "zdi^V"<C-R>z^V"<ESC>
-vnoremap ' "zdi'<C-R>z'<ESC>
-"Vimで隣接した括弧の開き記号を消すと同時に閉じ記号も削除する
-function! DeleteParenthesesAdjoin()
-    let pos = col(".") - 1  " カーソルの位置．1からカウント
-    let str = getline(".")  " カーソル行の文字列
-    let parentLList = ["(", "[", "{", "\'", "\""]
-    let parentRList = [")", "]", "}", "\'", "\""]
-    let cnt = 0
+" inoremap { {}<LEFT>
+" inoremap [ []<LEFT>
+" inoremap ( ()<LEFT>
+" inoremap " ""<LEFT>
+" inoremap ' ''<LEFT>
+" vnoremap { "zdi^V{<C-R>z}<ESC>
+" vnoremap [ "zdi^V[<C-R>z]<ESC>
+" vnoremap ( "zdi^V(<C-R>z)<ESC>
+" vnoremap " "zdi^V"<C-R>z^V"<ESC>
+" vnoremap ' "zdi'<C-R>z'<ESC>
+" "Vimで隣接した括弧の開き記号を消すと同時に閉じ記号も削除する
+" function! DeleteParenthesesAdjoin()
+"     let pos = col(".") - 1  " カーソルの位置．1からカウント
+"     let str = getline(".")  " カーソル行の文字列
+"     let parentLList = ["(", "[", "{", "\'", "\""]
+"     let parentRList = [")", "]", "}", "\'", "\""]
+"     let cnt = 0
+"
+"     let output = ""
+"
+"     " カーソルが行末の場合
+"     if pos == strlen(str)
+"         return "\b"
+"     endif
+"     for c in parentLList
+"         " カーソルの左右が同種の括弧
+"         if str[pos-1] == c && str[pos] == parentRList[cnt]
+"             call cursor(line("."), pos + 2)
+"             let output = "\b"
+"             break
+"         endif
+"         let cnt += 1
+"     endfor
+"     return output."\b"
+" endfunction
+" " " BackSpaceに割り当て
+" inoremap <silent> <BS> <C-R>=DeleteParenthesesAdjoin()<CR>
+" " クリップボードをデフォルトのレジスタとして指定。後にYankRingを使うので
+" " 'unnamedplus'が存在しているかどうかで設定を分ける必要がある
+" if has('unnamedplus')
+" 	" set clipboard& clipboard+=unnamedplus " 2013-07-03 14:30 unnamed 追加
+" 	set clipboard& clipboard+=unnamedplus,unnamed 
+" else
+" 	" set clipboard& clipboard+=unnamed,autoselect 2013-06-24 10:00 autoselect 削除
+" 	set clipboard& clipboard+=unnamed
+" endif
+"  vim-ref のバッファを q で閉じられるようにする
+autocmd FileType ref-* nnoremap <buffer> <silent> q :<C-u>close<CR>
 
-    let output = ""
+" 辞書定義
+let g:ref_source_webdict_sites = {
+\   'je': {
+\     'url': 'http://dictionary.infoseek.ne.jp/jeword/%s',
+\   },
+\   'ej': {
+\     'url': 'http://dictionary.infoseek.ne.jp/ejword/%s',
+\   },
+\ }
 
-    " カーソルが行末の場合
-    if pos == strlen(str)
-        return "\b"
-    endif
-    for c in parentLList
-        " カーソルの左右が同種の括弧
-        if str[pos-1] == c && str[pos] == parentRList[cnt]
-            call cursor(line("."), pos + 2)
-            let output = "\b"
-            break
-        endif
-        let cnt += 1
-    endfor
-    return output."\b"
+" デフォルトサイト
+let g:ref_source_webdict_sites.default = 'ej'
+
+" 出力に対するフィルタ
+" 最初の数行を削除
+function! g:ref_source_webdict_sites.je.filter(output)
+  return join(split(a:output, "\n")[15 :], "\n")
 endfunction
-" BackSpaceに割り当て
-inoremap <silent> <BS> <C-R>=DeleteParenthesesAdjoin()<CR>
-" クリップボードをデフォルトのレジスタとして指定。後にYankRingを使うので
-" 'unnamedplus'が存在しているかどうかで設定を分ける必要がある
-if has('unnamedplus')
-	" set clipboard& clipboard+=unnamedplus " 2013-07-03 14:30 unnamed 追加
-	set clipboard& clipboard+=unnamedplus,unnamed 
-else
-	" set clipboard& clipboard+=unnamed,autoselect 2013-06-24 10:00 autoselect 削除
-	set clipboard& clipboard+=unnamed
-endif
+
+function! g:ref_source_webdict_sites.ej.filter(output)
+  return join(split(a:output, "\n")[15 :], "\n")
+endfunction
+" 開いたバッファを q で閉じれるようにする
+autocmd BufEnter ==Translate==\ Excite nnoremap <buffer> <silent> q :<C-u>close<CR>
+call altercmd#load()
+" :ej 英単語
+CAlterCommand ej Ref webdict ej
+" :je 日本語
+CAlterCommand je Ref webdict je
 "カラースキーマの設定
 colorscheme molokai
 hi Comment ctermfg=46
