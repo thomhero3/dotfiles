@@ -617,6 +617,9 @@ call altercmd#load()
 CAlterCommand ej Ref webdict ej
 " :je 日本語
 CAlterCommand je Ref webdict je
+ 
+noremap <Space>cej :Ref webdict ej <C-r><C-w><CR>
+noremap <Space>cje :Ref webdict je <C-r><C-w><CR>
 "カラースキーマの設定
 colorscheme molokai
 hi Comment ctermfg=46
