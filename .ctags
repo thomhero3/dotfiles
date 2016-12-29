@@ -1,0 +1,6 @@
+--append=yes
+--recurse=yes
+--c++-kinds=cdefgmnstuvx
+--c-kinds=cdefgmnstuvx
+--python-kinds=cfm
+--vim-kinds=afv
